@@ -22,8 +22,12 @@ cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
 
 pygame.init()
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)  # Fullscreen mode
+""" screen = pygame.display.set_mode((800, 600))  # Fullscreen mode
+screen_width, screen_height = pygame.display.get_surface().get_size() """
+
+screen = pygame.display.set_mode((0, 0), pygame.RESIZABLE | pygame.FULLSCREEN)  # Fullscreen mode
 screen_width, screen_height = pygame.display.get_surface().get_size()
+
 black = (0, 0, 0)
 colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255), (255, 0, 255)]
 
@@ -119,7 +123,7 @@ def switch_effects():
                 if event.key == pygame.K_x:  # Pygame's constant for the 'X' key
                     running = False
                 elif event.key == pygame.K_n:  # Pygame's constant for the 'N' key to switch effects
-                    current_effect = (current_effect + 1) % 7  # Immediately switch to the next effect
+                    current_effect = (current_effect + 1) % 8  # Immediately switch to the next effect
                     start_time = time.time()  # Reset the timer so it doesn't immediately switch again
                 elif event.key == pygame.K_ESCAPE:  # Pygame's constant for the 'ESC' key
                     running = False
