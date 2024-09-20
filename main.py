@@ -7,6 +7,7 @@ import pyaudio
 import librosa
 
 # Import the separated effect files
+from effects.face_effect import face_replacement_effect
 from effects.matrix_effect import matrix_effect
 from effects.smiley_effect import face_detection_effect
 from effects.spooky_filter import spooky_filter_with_bpm
@@ -144,12 +145,12 @@ def switch_effects():
         # Apply the selected effect
         if current_effect == 0:
             first_frame, last_beat_time = spooky_filter_with_bpm(first_frame, current_bpm, last_beat_time, cap, screen_width, screen_height, screen)
-        elif current_effect == 1:
+        elif current_effect == 6:
             face_detection_effect(cap, screen, screen_width, screen_height)
         elif current_effect == 7:
             matrix_effect(cap, screen, screen_width, screen_height)
-        # elif current_effect == 6:
-        #     colorful_circles(cap, screen, screen_width, screen_height, black)
+        elif current_effect == 1:
+            face_replacement_effect(cap, screen, screen_width, screen_height)
         elif current_effect == 2:
             edge_detection(cap, screen, screen_width, screen_height)
         elif current_effect == 3:
