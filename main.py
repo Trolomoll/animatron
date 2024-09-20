@@ -9,7 +9,7 @@ import librosa
 # Import the separated effect files
 from effects.face_effect import face_replacement_effect
 from effects.matrix_effect import matrix_effect
-from effects.smiley_effect import face_detection_effect
+from effects.smiley_effect import face_detection_effect_with_bpm
 from effects.spooky_filter import spooky_filter_with_bpm
 from effects.colorful_circles import colorful_circles
 from effects.edge_detection import edge_detection, edge_detection_with_afterimage, edge_detection_with_pulse_and_afterimage
@@ -146,7 +146,7 @@ def switch_effects():
         if current_effect == 0:
             first_frame, last_beat_time = spooky_filter_with_bpm(first_frame, current_bpm, last_beat_time, cap, screen_width, screen_height, screen)
         elif current_effect == 6:
-            face_detection_effect(cap, screen, screen_width, screen_height)
+            last_beat_time = face_detection_effect_with_bpm(cap, screen, screen_width, screen_height, bpm, last_beat_time)
         elif current_effect == 7:
             matrix_effect(cap, screen, screen_width, screen_height)
         elif current_effect == 1:
