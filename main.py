@@ -7,9 +7,11 @@ import pyaudio
 import librosa
 
 # Import the separated effect files
+from effects.matrix_effect import matrix_effect
+from effects.smiley_effect import face_detection_effect
 from effects.spooky_filter import spooky_filter_with_bpm
 from effects.colorful_circles import colorful_circles
-from effects.edge_detection import edge_detection
+from effects.edge_detection import edge_detection, edge_detection_with_afterimage, edge_detection_with_pulse_and_afterimage
 from effects.ascii_webcam_effect import ascii_webcam_effect
 from effects.circle_grid_effect import circle_grid_effect
 from effects.rhythmic_light_trails import rhythmic_light_trails
@@ -47,7 +49,8 @@ def estimate_bpm(audio_data):
     else:
         n_fft = 2048  # Use the default FFT size for larger audio buffers
     
-    tempo, _ = librosa.beat.beat_track(y=audio_data.astype(float), sr=RATE, n_fft=n_fft)
+    # tempo, _ = librosa.beat.beat_track(y=audio_data.astype(float), sr=RATE, n_fft=n_fft)
+    tempo, _ = librosa.beat.beat_track(y=audio_data.astype(float), sr=RATE)
     return tempo
 
 def run_bpm_estimation():
@@ -118,12 +121,13 @@ def switch_effects():
                 elif event.key == pygame.K_n:  # Pygame's constant for the 'N' key to switch effects
                     current_effect = (current_effect + 1) % 7  # Immediately switch to the next effect
                     start_time = time.time()  # Reset the timer so it doesn't immediately switch again
-
+                elif event.key == pygame.K_ESCAPE:  # Pygame's constant for the 'ESC' key
+                    running = False
         current_time = time.time()
 
         # Check if it's time to switch effects based on the timer
         if current_time - start_time > effect_switch_time:
-            current_effect = (current_effect + 1) % 7  # Cycle through effects
+            current_effect = (current_effect + 1) % 10  # Cycle through effects
             start_time = current_time  # Reset the effect switch timer
 
         # Safely read the current BPM
@@ -137,15 +141,21 @@ def switch_effects():
         if current_effect == 0:
             previous_frame = circle_grid_effect(current_bpm, previous_frame, cap, screen, screen_width, screen_height)
         elif current_effect == 1:
+            face_detection_effect(cap, screen, screen_width, screen_height)
+        elif current_effect == 7:
+            matrix_effect(cap, screen, screen_width, screen_height)
+        elif current_effect == 6:
             colorful_circles(cap, screen, screen_width, screen_height, black)
         elif current_effect == 2:
             edge_detection(cap, screen, screen_width, screen_height)
         elif current_effect == 3:
-            edge_detection_two(cap, screen, screen_width, screen_height)
+            edge_detection_with_pulse_and_afterimage(cap, screen, screen_width, screen_height, current_bpm)
         elif current_effect == 4:
             rhythmic_light_trails(cap, screen, screen_width, screen_height, black, bpm)
         elif current_effect == 5:
             last_beat_time = ascii_webcam_effect(current_bpm, last_beat_time, cap, screen, screen_width, screen_height, black)
+        # elif current_effect == 6:
+        #     last_beat_time = edge_detection_with_afterimage(cap, screen, screen_width, screen_height)
         else:
             first_frame, last_beat_time = spooky_filter_with_bpm(first_frame, current_bpm, last_beat_time, cap, screen_width, screen_height, screen)
 

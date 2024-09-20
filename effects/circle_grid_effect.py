@@ -16,7 +16,7 @@ def circle_grid_effect(bpm, previous_frame, cap, screen, screen_width, screen_he
     color_intensity_factor = np.interp(bpm, [60, 180], [0.5, 1.5])  # Adjust between 0.5 and 1.5 based on BPM
 
     # Generate a random or BPM-dependent RGB tint
-    tint_color = np.array([random.randint(100, 255), random.randint(100, 255), random.randint(100, 255)], dtype=np.uint8)
+    tint_color = np.array([random.randint(100, 255), random.randint(100, 255), random.randint(100, 255)], dtype=np.uint16)
 
     # Capture a frame from the webcam
     ret, frame = cap.read()
@@ -40,9 +40,9 @@ def circle_grid_effect(bpm, previous_frame, cap, screen, screen_width, screen_he
             R = int(color[2] * color_intensity_factor)
 
             # Apply the tint color by multiplying the current pixel's color by the tint
-            B = int(B * tint_color[0] / 255)
-            G = int(G * tint_color[1] / 255)
-            R = int(R * tint_color[2] / 255)
+            B = (B * tint_color[0] / 255)
+            G = (G * tint_color[1] / 255)
+            R = (R * tint_color[2] / 255)
 
             # Ensure the values are within valid RGB range (0-255)
             B, G, R = [int(np.clip(B, 0, 255)), int(np.clip(G, 0, 255)), int(np.clip(R, 0, 255))]
