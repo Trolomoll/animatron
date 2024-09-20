@@ -2,6 +2,7 @@ import cv2
 import pygame
 import random
 import math
+import numpy as np
 
 def rhythmic_light_trails(cap, screen, screen_width, screen_height, black, bpm):
     ret, frame1 = cap.read()
@@ -41,7 +42,7 @@ def rhythmic_light_trails(cap, screen, screen_width, screen_height, black, bpm):
             (x, y, w, h) = cv2.boundingRect(contour)
 
             # Create pulsing light trails
-            pulse_radius = abs(math.sin(pygame.time.get_ticks() / (500.0 / (bpm / 60)))) * pulse_size
+            pulse_radius = abs(math.sin(pygame.time.get_ticks() / (500.0 / (bpm+0.1 / 60)))) * pulse_size
 
             # Randomize the color slightly for each pulse and ensure valid RGB range (0-255)
             randomized_color = (

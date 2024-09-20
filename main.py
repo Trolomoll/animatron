@@ -105,7 +105,7 @@ def switch_effects():
     start_time = time.time()
     first_frame = None  # Initialize first_frame for spooky filter
     last_beat_time = time.time()  # Track time for BPM-based switching
-    effect_switch_time = 3  # Time interval to switch effects (in seconds)
+    effect_switch_time = 20  # Time interval to switch effects (in seconds)
     current_effect = 0  # 0 for circle grid, 1 for colorful circles, etc.
     previous_frame = None  # Initialize for afterimage effect in circle grid
 
@@ -139,13 +139,13 @@ def switch_effects():
 
         # Apply the selected effect
         if current_effect == 0:
-            previous_frame = circle_grid_effect(current_bpm, previous_frame, cap, screen, screen_width, screen_height)
+            first_frame, last_beat_time = spooky_filter_with_bpm(first_frame, current_bpm, last_beat_time, cap, screen_width, screen_height, screen)
         elif current_effect == 1:
             face_detection_effect(cap, screen, screen_width, screen_height)
         elif current_effect == 7:
             matrix_effect(cap, screen, screen_width, screen_height)
-        elif current_effect == 6:
-            colorful_circles(cap, screen, screen_width, screen_height, black)
+        # elif current_effect == 6:
+        #     colorful_circles(cap, screen, screen_width, screen_height, black)
         elif current_effect == 2:
             edge_detection(cap, screen, screen_width, screen_height)
         elif current_effect == 3:
