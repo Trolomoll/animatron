@@ -150,7 +150,7 @@ def switch_effects():
         elif current_effect == 7:
             matrix_effect(cap, screen, screen_width, screen_height)
         elif current_effect == 1:
-            face_replacement_effect(cap, screen, screen_width, screen_height)
+            face_replacement_effect(cap, screen, screen_width, screen_height, current_bpm)
         elif current_effect == 2:
             edge_detection(cap, screen, screen_width, screen_height)
         elif current_effect == 3:
