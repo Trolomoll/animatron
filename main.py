@@ -27,7 +27,7 @@ def get_camera_backend():
         return cv2.CAP_ANY  # Default backend for Linux/Mac
 
 # Initialize webcam and Pygame
-cap = cv2.VideoCapture(1, get_camera_backend())
+cap = cv2.VideoCapture(0, get_camera_backend())
 cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
 
 pygame.init()
