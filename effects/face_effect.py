@@ -32,45 +32,15 @@ face_image_state = {
     'last_beat_time': time.time(),
 }
 
-def rotate_image(image, angle):
-    """Rotate an image by a given angle while keeping transparency."""
-    h, w = image.shape[:2]
-    center = (w // 2, h // 2)
-    
-    # Get rotation matrix
-    rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
-    
-    # Calculate new bounding box size
-    cos = np.abs(rotation_matrix[0, 0])
-    sin = np.abs(rotation_matrix[0, 1])
-    new_w = int((h * sin) + (w * cos))
-    new_h = int((h * cos) + (w * sin))
-    
-    # Adjust rotation matrix for new size
-    rotation_matrix[0, 2] += (new_w / 2) - center[0]
-    rotation_matrix[1, 2] += (new_h / 2) - center[1]
-    
-    # Rotate with transparent background
-    rotated = cv2.warpAffine(image, rotation_matrix, (new_w, new_h), 
-                              flags=cv2.INTER_LINEAR, 
-                              borderMode=cv2.BORDER_CONSTANT, 
-                              borderValue=(0, 0, 0, 0))
-    return rotated
-
-
 # Function to overlay random image with transparency onto the face bounding box
-def overlay_random_image_with_alpha(background, overlay, x, y, w, h, scale_factor=1.5, angle=0):
-    # Apply rotation if angle is non-zero
-    if angle != 0:
-        overlay = rotate_image(overlay, angle)
-    
+def overlay_random_image_with_alpha(background, overlay, x, y, w, h, scale_factor=1.5, offset_x=0, offset_y=0):
     # Increase the size of the bounding box by the scale factor
     new_w = int(w * scale_factor)
     new_h = int(h * scale_factor)
 
-    # Adjust the position so the image stays centered
-    new_x = x - (new_w - w) // 2
-    new_y = y - (new_h - h) // 2
+    # Adjust the position so the image stays centered, plus apply diagonal offset for head bump
+    new_x = x - (new_w - w) // 2 + offset_x
+    new_y = y - (new_h - h) // 2 + offset_y
 
     # Resize the random image to fill the enlarged bounding box
     overlay_resized = cv2.resize(overlay, (new_w, new_h), interpolation=cv2.INTER_AREA)
@@ -117,15 +87,25 @@ def face_replacement_effect(cap, screen, screen_width, screen_height, bpm=120):
 
     current_time = time.time()
     
-    # Calculate beat timing for head bobbing
+    # Calculate beat timing for head bumping
     if bpm <= 0:
         bpm = 120  # Default BPM
     beat_duration = 60.0 / bpm  # Duration of one beat in seconds
     
-    # Calculate tilt angle based on beat phase (oscillates between -15 and +15 degrees)
-    # Using sine wave for smooth diagonal bobbing motion
+    # Calculate diagonal offset for head bump effect
+    # On each beat, the head jumps diagonally (down-right on beat, back to normal off-beat)
     beat_phase = (current_time % beat_duration) / beat_duration
-    tilt_angle = 15 * math.sin(beat_phase * 2 * math.pi)  # Oscillate between -15 and +15 degrees
+    
+    # Sharp bump: head goes down-right on the beat (first half), returns on second half
+    bump_amount = 20  # pixels to move diagonally
+    if beat_phase < 0.5:
+        # On the beat - head bumps down and to the right
+        offset_x = int(bump_amount * (1 - beat_phase * 2))  # Quick snap then ease back
+        offset_y = int(bump_amount * (1 - beat_phase * 2))
+    else:
+        # Off-beat - head returns to center
+        offset_x = 0
+        offset_y = 0
     
     # Check if it's time to switch images (every 2 seconds)
     if current_time - face_image_state['last_switch_time'] >= face_image_state['image_hold_duration']:
@@ -146,8 +126,8 @@ def face_replacement_effect(cap, screen, screen_width, screen_height, bpm=120):
             
             assigned_image = face_image_state['current_images'][i]
             
-            # Replace the face bounding box with the assigned image, with tilt
-            overlay_random_image_with_alpha(img, assigned_image, x, y, w, h, scale_factor=2, angle=tilt_angle)
+            # Replace the face bounding box with the assigned image, with diagonal bump offset
+            overlay_random_image_with_alpha(img, assigned_image, x, y, w, h, scale_factor=2, offset_x=offset_x, offset_y=offset_y)
 
     # Resize the frame to fit the Pygame screen dimensions
     img_resized = cv2.resize(img, (screen_width, screen_height))
