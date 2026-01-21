@@ -38,9 +38,11 @@ def overlay_random_image_with_alpha(background, overlay, x, y, w, h, scale_facto
     new_w = int(w * scale_factor)
     new_h = int(h * scale_factor)
 
-    # Adjust the position so the image stays centered, plus apply diagonal offset for head bump
+    # Adjust the position - shift UP more to cover hair (face detection misses hair)
+    # Center horizontally, but shift up by 30% of the height difference to cover hair
     new_x = x - (new_w - w) // 2 + offset_x
-    new_y = y - (new_h - h) // 2 + offset_y
+    vertical_hair_offset = int((new_h - h) * 0.35)  # Shift up more to cover hair
+    new_y = y - (new_h - h) // 2 - vertical_hair_offset + offset_y
 
     # Resize the random image to fill the enlarged bounding box
     overlay_resized = cv2.resize(overlay, (new_w, new_h), interpolation=cv2.INTER_AREA)

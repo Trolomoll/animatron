@@ -147,7 +147,7 @@ def switch_effects():
         with bpm_lock:
             current_bpm = bpm
 
-        current_effect = 1
+        # current_effect = 6
 
         if current_bpm == 0:
             current_bpm = 60

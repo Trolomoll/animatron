@@ -25,26 +25,38 @@ def get_smiley_color(bpm, last_beat_time):
 
 # Function to draw a smiley face inside a bounding box with dynamic color
 def draw_smiley(img, x, y, w, h, smiley_color):
-    # Center of the face bounding box
-    center_x, center_y = x + w // 2, y + h // 2
+    # Expand bounding box to cover full head (including hair)
+    # Expand upward by 40% to cover hair, and sides by 20%
+    expand_top = int(h * 0.4)
+    expand_sides = int(w * 0.2)
+    
+    # Adjusted dimensions
+    new_y = y - expand_top
+    new_x = x - expand_sides
+    new_w = w + expand_sides * 2
+    new_h = h + expand_top
+    
+    # Center of the expanded bounding box
+    center_x = new_x + new_w // 2
+    center_y = new_y + new_h // 2
 
-    # Draw the face (head) with the dynamic smiley color
-    cv2.circle(img, (center_x, center_y), min(w, h) // 2, smiley_color, -1)
+    # Draw the face (head) with the dynamic smiley color - larger to cover hair
+    cv2.circle(img, (center_x, center_y), min(new_w, new_h) // 2, smiley_color, -1)
 
-    # Draw the eyes
-    eye_radius = min(w, h) // 10
-    eye_offset_x = w // 4
-    eye_offset_y = h // 6
+    # Draw the eyes (positioned relative to the expanded head)
+    eye_radius = min(new_w, new_h) // 10
+    eye_offset_x = new_w // 4
+    eye_offset_y = new_h // 8  # Adjusted for larger head
     cv2.circle(img, (center_x - eye_offset_x, center_y - eye_offset_y), eye_radius, (0, 0, 0), -1)  # Left eye
     cv2.circle(img, (center_x + eye_offset_x, center_y - eye_offset_y), eye_radius, (0, 0, 0), -1)  # Right eye
 
     # Draw the smile (arc/ellipse)
-    smile_thickness = 2
-    smile_radius_x = w // 5
-    smile_radius_y = h // 10
+    smile_thickness = 3
+    smile_radius_x = new_w // 5
+    smile_radius_y = new_h // 10
     smile_start_angle = 20
     smile_end_angle = 160
-    cv2.ellipse(img, (center_x, center_y + h // 6), (smile_radius_x, smile_radius_y),
+    cv2.ellipse(img, (center_x, center_y + new_h // 6), (smile_radius_x, smile_radius_y),
                 0, smile_start_angle, smile_end_angle, (0, 0, 0), smile_thickness)
 
 # Face detection effect function with smileys that change color based on BPM
