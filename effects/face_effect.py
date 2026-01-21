@@ -19,7 +19,7 @@ def load_images_from_folder(folder):
     return images
 
 # Assuming your images are stored in a folder called 'images'
-folder_path = 'musk'  # Update with your folder path
+folder_path = 'obama'  # Update with your folder path
 random_images = load_images_from_folder(folder_path)
 
 # Function to overlay random image with transparency onto the face bounding box
