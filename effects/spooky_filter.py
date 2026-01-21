@@ -10,7 +10,7 @@ def spooky_filter_with_bpm(first_frame, bpm, last_beat_time, cap, screen_width, 
 
     ret, frame = cap.read()
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    gray = cv2.GaussianBlur(gray, (15, 15), 1)
+    gray = cv2.GaussianBlur(gray, (9, 9), 1)  # Medium blur - balanced between sharp and smooth
 
     current_time = time.time()
 
@@ -25,12 +25,17 @@ def spooky_filter_with_bpm(first_frame, bpm, last_beat_time, cap, screen_width, 
         first_frame = gray.copy()
 
     delta_frame = cv2.absdiff(first_frame, gray)
+    
+    # Apply threshold to filter out noise but keep the silhouette filled
+    _, delta_frame = cv2.threshold(delta_frame, 20, 255, cv2.THRESH_TOZERO)
+    
     delta_frame_rgb = cv2.cvtColor(delta_frame, cv2.COLOR_GRAY2RGB)
     random_color = np.array([random.randint(100, 255), random.randint(100, 255), random.randint(100, 255)], dtype=np.uint8)
 
-    delta_frame_rgb_tinted = cv2.multiply(delta_frame_rgb*0.1, random_color)
-    delta_frame_rgb_tinted = np.clip(delta_frame_rgb_tinted, 0, 255)
-    delta_frame_rgb_tinted = cv2.convertScaleAbs(delta_frame_rgb_tinted, alpha=0.6)
+    # Keep good color intensity but normalize the delta to avoid overblown whites
+    delta_normalized = delta_frame_rgb.astype(np.float32) / 255.0
+    delta_frame_rgb_tinted = (delta_normalized * random_color).astype(np.uint8)
+    delta_frame_rgb_tinted = cv2.convertScaleAbs(delta_frame_rgb_tinted, alpha=0.8)
     delta_frame_rgb_resized = cv2.resize(delta_frame_rgb_tinted, (screen_width, screen_height), interpolation=cv2.INTER_CUBIC)
     delta_frame_rgb_swapped = np.swapaxes(delta_frame_rgb_resized, 0, 1)
 

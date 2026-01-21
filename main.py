@@ -139,6 +139,8 @@ def switch_effects():
         with bpm_lock:
             current_bpm = bpm
 
+        current_effect = 0
+
         if current_bpm == 0:
             current_bpm = 60
 
@@ -159,8 +161,8 @@ def switch_effects():
             rhythmic_light_trails(cap, screen, screen_width, screen_height, black, bpm)
         elif current_effect == 5:
             last_beat_time = ascii_webcam_effect(current_bpm, last_beat_time, cap, screen, screen_width, screen_height, black)
-        # elif current_effect == 6:
-        #     last_beat_time = edge_detection_with_afterimage(cap, screen, screen_width, screen_height)
+        elif current_effect == 8:
+            last_beat_time = edge_detection_with_afterimage(cap, screen, screen_width, screen_height)
         else:
             first_frame, last_beat_time = spooky_filter_with_bpm(first_frame, current_bpm, last_beat_time, cap, screen_width, screen_height, screen)
 
