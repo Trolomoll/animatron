@@ -13,6 +13,14 @@
             "cwd": "${workspaceFolder}"
         },
         {
+            "name": "Test Camera",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/testCam.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}"
+        },
+        {
             "name": "Python: Current File",
             "type": "debugpy",
             "request": "launch",

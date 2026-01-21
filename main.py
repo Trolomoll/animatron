@@ -5,6 +5,7 @@ import time
 import threading
 import pyaudio
 import librosa
+import platform
 
 # Import the separated effect files
 from effects.face_effect import face_replacement_effect
@@ -18,8 +19,15 @@ from effects.circle_grid_effect import circle_grid_effect
 from effects.rhythmic_light_trails import rhythmic_light_trails
 from effects.edge_detection_two import edge_detection_two
 
+# Use DirectShow on Windows, default backend on Linux/Mac
+def get_camera_backend():
+    if platform.system() == 'Windows':
+        return cv2.CAP_DSHOW
+    else:
+        return cv2.CAP_ANY  # Default backend for Linux/Mac
+
 # Initialize webcam and Pygame
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1, get_camera_backend())
 cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
 
 pygame.init()
@@ -139,7 +147,7 @@ def switch_effects():
         with bpm_lock:
             current_bpm = bpm
 
-        current_effect = 0
+        current_effect = 1
 
         if current_bpm == 0:
             current_bpm = 60
