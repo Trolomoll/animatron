@@ -18,6 +18,7 @@ from effects.ascii_webcam_effect import ascii_webcam_effect
 from effects.circle_grid_effect import circle_grid_effect
 from effects.rhythmic_light_trails import rhythmic_light_trails
 from effects.edge_detection_two import edge_detection_two
+from effects.motion_rainbow_effect import motion_rainbow_effect
 
 # Use DirectShow on Windows, default backend on Linux/Mac
 def get_camera_backend():
@@ -118,9 +119,10 @@ def switch_effects():
     start_time = time.time()
     first_frame = None  # Initialize first_frame for spooky filter
     last_beat_time = time.time()  # Track time for BPM-based switching
-    effect_switch_time = 20  # Time interval to switch effects (in seconds)
+    effect_switch_time = 10  # Time interval to switch effects (in seconds)
     current_effect = 0  # 0 for circle grid, 1 for colorful circles, etc.
     previous_frame = None  # Initialize for afterimage effect in circle grid
+    motion_rainbow_state = None
 
     while running:
         for event in pygame.event.get():
@@ -132,7 +134,7 @@ def switch_effects():
                 if event.key == pygame.K_x:  # Pygame's constant for the 'X' key
                     running = False
                 elif event.key == pygame.K_n:  # Pygame's constant for the 'N' key to switch effects
-                    current_effect = (current_effect + 1) % 8  # Immediately switch to the next effect
+                    current_effect = (current_effect + 1) % 10  # Immediately switch to the next effect
                     start_time = time.time()  # Reset the timer so it doesn't immediately switch again
                 elif event.key == pygame.K_ESCAPE:  # Pygame's constant for the 'ESC' key
                     running = False
@@ -170,7 +172,11 @@ def switch_effects():
         elif current_effect == 5:
             last_beat_time = ascii_webcam_effect(current_bpm, last_beat_time, cap, screen, screen_width, screen_height, black)
         elif current_effect == 8:
-            last_beat_time = edge_detection_with_afterimage(cap, screen, screen_width, screen_height)
+            edge_detection_with_afterimage(cap, screen, screen_width, screen_height)
+        elif current_effect == 9:
+            motion_rainbow_state = motion_rainbow_effect(
+                motion_rainbow_state, cap, screen, screen_width, screen_height
+            )
         else:
             first_frame, last_beat_time = spooky_filter_with_bpm(first_frame, current_bpm, last_beat_time, cap, screen_width, screen_height, screen)
 
